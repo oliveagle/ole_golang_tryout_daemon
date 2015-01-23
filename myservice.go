@@ -4,15 +4,15 @@ package main
 import (
 	"fmt"
 	"log"
-	// "net"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
 
 	// "bytes"
 	"code.google.com/p/winsvc/debug"
-	"code.google.com/p/winsvc/mgr"
-	"code.google.com/p/winsvc/svc"
+	// "code.google.com/p/winsvc/mgr"
+	// "code.google.com/p/winsvc/svc"
 	"time"
 	// "code.google.com/p/winsvc/winapi"
 	"github.com/takama/daemon"
