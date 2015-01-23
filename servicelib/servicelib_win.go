@@ -11,11 +11,20 @@ import (
 	"time"
 )
 
-func IsAnInteractiveSession() (bool, error) {
+type Service struct {
+	name string
+	desc string
+}
+
+func NewService(name, desc string) *Service {
+	return &Service{name, desc}
+}
+
+func (this *Service) IsAnInteractiveSession() (bool, error) {
 	return svc.IsAnInteractiveSession()
 }
 
-func StartService(name string) error {
+func (this *Service) StartService() error {
 	log.Println("ServiceManager.StartService\r\n")
 	m, err := mgr.Connect()
 	if err != nil {
@@ -24,7 +33,7 @@ func StartService(name string) error {
 	defer m.Disconnect()
 	log.Println("Connected mgr\r\n")
 
-	s, err := m.OpenService(name)
+	s, err := m.OpenService(this.name)
 	if err != nil {
 		return fmt.Errorf("could not access service: %v", err)
 	}
@@ -40,7 +49,7 @@ func StartService(name string) error {
 	return nil
 }
 
-func InstallService(name, desc string) error {
+func (this *Service) InstallService() error {
 	log.Println("ServiceManager.InstallService\r\n")
 	exepath, err := exePath()
 	if err != nil {
@@ -51,17 +60,17 @@ func InstallService(name, desc string) error {
 		return err
 	}
 	defer m.Disconnect()
-	s, err := m.OpenService(name)
+	s, err := m.OpenService(this.name)
 	if err == nil {
 		s.Close()
-		return fmt.Errorf("service %s already exists", name)
+		return fmt.Errorf("service %s already exists", this.name)
 	}
-	s, err = m.CreateService(name, exepath, mgr.Config{DisplayName: desc})
+	s, err = m.CreateService(this.name, exepath, mgr.Config{DisplayName: this.desc})
 	if err != nil {
 		return err
 	}
 	defer s.Close()
-	err = eventlog.InstallAsEventCreate(name, eventlog.Error|eventlog.Warning|eventlog.Info)
+	err = eventlog.InstallAsEventCreate(this.name, eventlog.Error|eventlog.Warning|eventlog.Info)
 	if err != nil {
 		s.Delete()
 		return fmt.Errorf("SetupEventLogSource() failed: %s", err)
@@ -69,47 +78,47 @@ func InstallService(name, desc string) error {
 	return nil
 }
 
-func RemoveService(name string) error {
+func (this *Service) RemoveService() error {
 	log.Println("ServiceManager.RemoveService\r\n")
 	m, err := mgr.Connect()
 	if err != nil {
 		return err
 	}
 	defer m.Disconnect()
-	s, err := m.OpenService(name)
+	s, err := m.OpenService(this.name)
 	if err != nil {
-		return fmt.Errorf("service %s is not installed", name)
+		return fmt.Errorf("service %s is not installed", this.name)
 	}
 	defer s.Close()
 	err = s.Delete()
 	if err != nil {
 		return err
 	}
-	err = eventlog.Remove(name)
+	err = eventlog.Remove(this.name)
 	if err != nil {
 		return fmt.Errorf("RemoveEventLogSource() failed: %s", err)
 	}
 	return nil
 }
 
-func Status(name string) error {
+func (this *Service) Status() error {
 	log.Println("ServiceManagement.Status\r\n")
 	return nil
 }
 
-func StopService(name string) error {
+func (this *Service) StopService() error {
 	log.Println("ServiceManager.StopService\r\n")
-	return controlService(name, svc.Stop, svc.Stopped)
+	return controlService(this.name, svc.Stop, svc.Stopped)
 }
 
-func PauseService(name string) error {
+func (this *Service) PauseService() error {
 	log.Println("ServiceManager.PauseService\r\n")
-	return controlService(name, svc.Pause, svc.Paused)
+	return controlService(this.name, svc.Pause, svc.Paused)
 }
 
-func ContinueService(name string) error {
+func (this *Service) ContinueService() error {
 	log.Println("ServiceManager.ContinueService\r\n")
-	return controlService(name, svc.Continue, svc.Running)
+	return controlService(this.name, svc.Continue, svc.Running)
 }
 
 func controlService(name string, c svc.Cmd, to svc.State) error {

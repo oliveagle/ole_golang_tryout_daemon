@@ -91,13 +91,13 @@ func (service *Service) Manage() (string, error) {
 			return service.Install()
 		case "remove":
 			return service.Remove()
+		case "status":
+			return service.Status()
 		case "start":
 			log.Printf("starting %s service\r\n", name)
 			return service.Start()
 		case "stop":
 			return service.Stop()
-		case "status":
-			return service.Status()
 		case "log":
 			log.Println("testing\r\n")
 			return "", nil
@@ -148,7 +148,7 @@ func handleClient(client net.Conn) {
 }
 
 func main() {
-	f, err := os.OpenFile("c:\\tools\\myservice.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile("myservice.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		fmt.Printf("error opening file: %v \n", err)
 	}
@@ -157,6 +157,8 @@ func main() {
 	log.SetOutput(f)
 
 	log.Println("main\r\n")
+    
+    log.Printf("Getegid: %s  \r\n", os.Getegid())
 
 	log.Println("daemon.New\r\n")
 	srv, err := daemon.New(name, description)

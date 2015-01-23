@@ -9,7 +9,9 @@ import (
 )
 
 const (
-	svcName = "oleservice win"
+	svcName = "oleservice"
+	svcDesc = "oleservice win"
+	port    = ":9977"
 )
 
 func usage(errmsg string) {
@@ -23,21 +25,8 @@ func usage(errmsg string) {
 }
 
 func main() {
-	isIntSess, err := servicelib.IsAnInteractiveSession()
-	if err != nil {
-		log.Fatalf("failed to determine if we are running in an interactive session: %v", err)
-	}
-	if !isIntSess {
-		runService(svcName, false)
-		return
-	}
-
-	if len(os.Args) < 2 {
-		usage("no command specified")
-	}
-
 	// - log --------------------
-	f, err := os.OpenFile("c:\\tools\\myservice.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile("myservice.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		fmt.Printf("error opening file: %v \n", err)
 	}
@@ -45,29 +34,44 @@ func main() {
 	log.SetOutput(f)
 	// -------------------- log -
 
-	log.Println("new func main\r\n")
+	srv := servicelib.NewService(svcName, svcDesc)
 
-	cmd := strings.ToLower(os.Args[1])
-	switch cmd {
-	case "install":
-		err = servicelib.InstallService(svcName, "my service")
-	case "remove":
-		err = servicelib.RemoveService(svcName)
-	case "start":
-		err = servicelib.StartService(svcName)
-	case "stop":
-		err = servicelib.StopService(svcName)
-	case "pause":
-		err = servicelib.PauseService(svcName)
-	case "continue":
-		err = servicelib.ContinueService(svcName)
-	case "status":
-		err = servicelib.Status(svcName)
-	default:
-		usage(fmt.Sprintf("invalid command %s", cmd))
+	if len(os.Args) >= 2 {
+		log.Println("new func main\r\n")
+
+		cmd := strings.ToLower(os.Args[1])
+		switch cmd {
+		case "install":
+			err = srv.InstallService()
+		case "remove":
+			err = srv.RemoveService()
+		case "start":
+			err = srv.StartService()
+		case "stop":
+			err = srv.StopService()
+		case "pause":
+			err = srv.PauseService()
+		case "continue":
+			err = srv.ContinueService()
+		case "status":
+			err = srv.Status()
+		default:
+			usage(fmt.Sprintf("invalid command %s", cmd))
+		}
+		if err != nil {
+			log.Fatalf("failed to %s %s: %v", cmd, svcName, err)
+		}
+	} else {
+		isIntSess, err := srv.IsAnInteractiveSession()
+		if err != nil {
+			log.Fatalf("failed to determine if we are running in an interactive session: %v", err)
+		}
+		if !isIntSess {
+			runService(svcName, false)
+			return
+		}
+		// runService(svcName, false)
 	}
-	if err != nil {
-		log.Fatalf("failed to %s %s: %v", cmd, svcName, err)
-	}
+
 	return
 }
