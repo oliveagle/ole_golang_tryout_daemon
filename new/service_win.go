@@ -13,14 +13,16 @@ import (
 	"time"
 )
 
-
 // BUG(brainman): MessageBeep Windows api is broken on Windows 7,
 // so this example does not beep when runs as service on Windows 7.
-
 
 var (
 	beepFunc = syscall.MustLoadDLL("user32.dll").MustFindProc("MessageBeep")
 )
+
+func getLogFilePath() string {
+	return "c:\\tools\\myservice.log"
+}
 
 func beep() {
 	log.Println("beep\r\n")
@@ -55,8 +57,6 @@ func handleClient(client net.Conn) {
 		}
 	}
 }
-
-
 
 type myservice struct{}
 
@@ -105,7 +105,7 @@ loop:
 }
 
 func runService(name string, isDebug bool) {
-	f, err := os.OpenFile("myservice.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile(getLogFilePath(), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		fmt.Printf("error opening file: %v \n", err)
 	}

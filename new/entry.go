@@ -26,7 +26,7 @@ func usage(errmsg string) {
 
 func main() {
 	// - log --------------------
-	f, err := os.OpenFile("myservice.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile(getLogFilePath(), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		fmt.Printf("error opening file: %v \n", err)
 	}

@@ -21,7 +21,6 @@ import (
 )
 
 const (
-
 	// name of the service, match with executable file name
 	name        = "myservice"
 	description = "My Echo Service"
@@ -33,6 +32,10 @@ const (
 // Service has embedded daemon
 type Service struct {
 	daemon.Daemon
+}
+
+func getLogFilePath() {
+	return "c:\\tools\\myservice.log"
 }
 
 var elog debug.Log
@@ -148,7 +151,7 @@ func handleClient(client net.Conn) {
 }
 
 func main() {
-	f, err := os.OpenFile("myservice.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile(getLogFilePath(), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		fmt.Printf("error opening file: %v \n", err)
 	}
@@ -157,8 +160,8 @@ func main() {
 	log.SetOutput(f)
 
 	log.Println("main\r\n")
-    
-    log.Printf("Getegid: %s  \r\n", os.Getegid())
+
+	log.Printf("Getegid: %s  \r\n", os.Getegid())
 
 	log.Println("daemon.New\r\n")
 	srv, err := daemon.New(name, description)
