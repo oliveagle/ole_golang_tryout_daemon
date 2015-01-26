@@ -10,7 +10,7 @@ import (
 
 const (
 	svcName = "oleservice"
-	svcDesc = "oleservice win"
+	svcDesc = "ole service description"
 	port    = ":9977"
 )
 
