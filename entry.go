@@ -2,13 +2,16 @@ package main
 
 import (
 	"fmt"
+	"github.com/oliveagle/ole_tryout_daemon/config"
 	"github.com/oliveagle/ole_tryout_daemon/servicelib"
+	// "github.com/spf13/viper"
 	"log"
 	"os"
 	"strings"
 )
 
 const (
+	version = "v0.0.1"
 	svcName = "oleservice"
 	svcDesc = "ole service description"
 	port    = ":9977"
@@ -34,6 +37,8 @@ func main() {
 	log.SetOutput(f)
 	// -------------------- log -
 
+	config.SetDefault()
+
 	srv := servicelib.NewService(svcName, svcDesc)
 
 	if len(os.Args) >= 2 {
@@ -55,6 +60,8 @@ func main() {
 			err = srv.ContinueService()
 		case "status":
 			err = srv.Status()
+		case "config":
+			err = srv.Config()
 		default:
 			usage(fmt.Sprintf("invalid command %s", cmd))
 		}

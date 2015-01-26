@@ -2,6 +2,9 @@ package servicelib
 
 import (
 	"fmt"
+	// "github.com/oliveagle/ole_tryout_daemon/config"
+	// "github.com/spf13/viper"
+	"github.com/takama/daemon"
 	"os"
 	"path/filepath"
 )
@@ -44,4 +47,29 @@ func exePath() (string, error) {
 		}
 	}
 	return "", err
+}
+
+type Service struct {
+	daemon.Daemon
+	name string
+	desc string
+	// config config.Config
+}
+
+func NewService(name, desc string) *Service {
+	srv, err := daemon.New(name, desc)
+	if err != nil {
+		fmt.Println("Error: ", err)
+		os.Exit(1)
+	}
+
+	// config.SetDefault()
+	// conf, err := config.NewConfig(name)
+	// if err != nil {
+	// 	fmt.Println("Error: ", err)
+	// 	os.Exit(1)
+	// }
+
+	// return &Service{srv, name, desc, *conf}
+	return &Service{srv, name, desc}
 }

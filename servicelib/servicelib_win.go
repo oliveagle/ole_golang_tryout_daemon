@@ -11,15 +11,6 @@ import (
 	"time"
 )
 
-type Service struct {
-	name string
-	desc string
-}
-
-func NewService(name, desc string) *Service {
-	return &Service{name, desc}
-}
-
 func (this *Service) IsAnInteractiveSession() (bool, error) {
 	return svc.IsAnInteractiveSession()
 }

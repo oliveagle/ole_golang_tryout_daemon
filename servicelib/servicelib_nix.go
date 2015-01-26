@@ -3,26 +3,9 @@
 package servicelib
 
 import (
-	"fmt"
-	"github.com/takama/daemon"
+	"github.com/spf13/viper"
 	"log"
-	"os"
 )
-
-type Service struct {
-	daemon.Daemon
-	name string
-	desc string
-}
-
-func NewService(name, desc string) *Service {
-	srv, err := daemon.New(name, desc)
-	if err != nil {
-		fmt.Println("Error: ", err)
-		os.Exit(1)
-	}
-	return &Service{srv, name, desc}
-}
 
 func (this *Service) IsAnInteractiveSession() (bool, error) {
 	log.Println("IsAnInteractiveSessioin\r\n")
@@ -71,5 +54,17 @@ func (this *Service) PauseService() error {
 
 func (this *Service) ContinueService() error {
 	log.Println("ServiceManager.ContinueService not supported \r\n")
+	return nil
+}
+
+func (this *Service) Config() error {
+	log.Println("Service Config -------")
+	// log.Println("config: ", this.config.Name)
+
+	log.Printf("config: %s \n", viper.GetString("msg"))
+	log.Printf("config: log.logpath%s \n", viper.GetString("log.logpath"))
+	log.Printf("config: %v \n", viper.GetStringMap("log")["logpath"])
+	log.Printf("config keys: %v \n", viper.AllKeys())
+
 	return nil
 }
